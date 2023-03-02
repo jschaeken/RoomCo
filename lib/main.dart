@@ -35,6 +35,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool activeAnouncement = true;
   int currentIndex = 0;
+  String currentPinnedAnnouncemnt = 'Omar u retard';
+  String currentAnnouncement = 'Latest Announcment';
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
               icon: const Icon(Icons.restart_alt)),
+          //Add pinned announcent button
+          IconButton(
+              onPressed: () async {
+                addAnnouncment(context).then((value) {
+                  if (value.announcement.isNotEmpty) {
+                    if (value.isPinned) {
+                      currentPinnedAnnouncemnt = value.announcement;
+                    } else {
+                      currentAnnouncement = value.announcement;
+                    }
+                    setState(() {});
+                  }
+                });
+              },
+              icon: const Icon(Icons.add)),
         ],
       ),
       drawer: Drawer(
@@ -149,8 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Container(
             alignment: Alignment.topCenter,
-            height: 78,
-            width: 400,
+            // height: 78,
+            width: MediaQuery.of(context).size.width * .85,
             decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(5),
@@ -159,19 +176,19 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Container(
                   alignment: Alignment.center,
-                  height: 70,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Material(
+                    borderRadius: BorderRadius.circular(5),
                     child: ListTile(
                         onTap: () => {},
                         //pinned icon
                         leading: const Icon(Icons.push_pin,
                             color: Colors.black, size: 30),
-                        title: const Text("Omar u fucking retard",
-                            style: TextStyle(fontSize: 25)),
+                        title: Text(currentPinnedAnnouncemnt,
+                            style: const TextStyle(fontSize: 25)),
                         subtitle: const Text('From Jacques'),
                         trailing: const CircleAvatar(
                           backgroundColor: Colors.amber,
@@ -190,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ? Container(
                   alignment: Alignment.topCenter,
                   height: 130,
-                  width: 400,
+                  width: MediaQuery.of(context).size.width * .85,
                   decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(5),
@@ -202,11 +219,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         height: 70,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        child: const Text("Latest Announcemnt",
-                            style:
-                                TextStyle(fontSize: 25, color: Colors.black)),
+                        child: Text(currentAnnouncement,
+                            style: const TextStyle(
+                                fontSize: 25, color: Colors.black)),
                       ),
                       const Spacer(),
                       Padding(
@@ -250,7 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         height: 70,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: const Text("No Recent Announcements",
                             style: TextStyle(fontSize: 25, color: Colors.grey)),
@@ -286,6 +303,72 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+Future<Announcement> addAnnouncment(BuildContext context) async {
+  //show dialog box
+  //text editing controller
+  final announcementController = TextEditingController();
+  FocusNode announcementFocusNode = FocusNode();
+  bool isPinned = false;
+  await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        announcementFocusNode.requestFocus();
+        return StatefulBuilder(
+            builder: (context, setState) => WillPopScope(
+                  onWillPop: () async => false,
+                  child: AlertDialog(
+                    title: const Text("Add Announcement"),
+                    content: SizedBox(
+                      height: 100,
+                      child: Column(
+                        children: [
+                          TextField(
+                            focusNode: announcementFocusNode,
+                            controller: announcementController,
+                            decoration: const InputDecoration(
+                                hintText: "Enter Announcement"),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text("Pin Announcement"),
+                              Switch.adaptive(
+                                  value: isPinned,
+                                  onChanged: (value) {
+                                    isPinned = value;
+                                    setState(() {});
+                                  }),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          //add announcement to database
+                          Navigator.of(context).pop(Announcement(
+                              announcementController.text,
+                              "Jacques",
+                              isPinned));
+                        },
+                        child: const Text("Add"),
+                      ),
+                    ],
+                  ),
+                ));
+      });
+  return Announcement(announcementController.text, "Jacques", isPinned);
+}
+
+class Announcement {
+  final String announcement;
+  final String author;
+  final bool isPinned;
+
+  Announcement(this.announcement, this.author, this.isPinned);
 }
 
 //Annuncements -> Preset Announcement Buttons
