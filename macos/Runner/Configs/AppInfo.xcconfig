@@ -8,7 +8,7 @@
 PRODUCT_NAME = roomco
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.jom.roomco.roomco
+PRODUCT_BUNDLE_IDENTIFIER = com.jom.roomco
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2023 com.jom.roomco. All rights reserved.
