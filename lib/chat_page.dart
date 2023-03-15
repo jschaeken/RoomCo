@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});
@@ -18,6 +19,21 @@ class AiChatPageState extends State<AiChatPage> {
   bool isWaiting = false;
   ScrollController scrollController = ScrollController();
   FocusNode focusNode = FocusNode();
+  bool isKeyboardVisible = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    scrollController.addListener(() {
+      //on vertical drag start, hide keyboard
+      if (scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        isKeyboardVisible = false;
+        setState(() {});
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +44,7 @@ class AiChatPageState extends State<AiChatPage> {
         curve: Curves.easeOut,
       );
     }
-    focusNode.requestFocus();
+    isKeyboardVisible ? focusNode.requestFocus() : focusNode.unfocus();
     return Stack(
       children: [
         Column(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -38,11 +54,13 @@ class AiChatPageState extends State<AiChatPage> {
             child: SizedBox(
               height: MediaQuery.of(context).size.height - 130,
               child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
                 controller: scrollController,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const SizedBox(height: 50),
                     for (var index = 0;
                         index < currentChatHisory.length;
                         index++)
@@ -143,31 +161,16 @@ class AiChatPageState extends State<AiChatPage> {
                   onSubmitted: (value) async {
                     currentChatHisory.add(Chat(role: 'user', content: value));
                     textEditingController.clear();
-                    focusNode.requestFocus();
+                    isKeyboardVisible = false;
                     //send message to ai
                     isWaiting = true;
-                    scrollController.animateTo(
-                      scrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
-                    );
                     setState(() {});
-                    scrollController.animateTo(
-                      scrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
-                    );
-                    setState(() {});
+
                     currentChatHisory =
                         await aiRequest(currentChatHisory, value, apiKey);
 
                     setState(() {
                       isWaiting = false;
-                      scrollController.animateTo(
-                        scrollController.position.maxScrollExtent,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOut,
-                      );
                     });
                   },
                   decoration: const InputDecoration(

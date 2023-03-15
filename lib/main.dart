@@ -53,30 +53,32 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
           centerTitle: true,
           elevation: 0,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    activeAnouncement = !activeAnouncement;
-                  });
-                },
-                icon: const Icon(Icons.restart_alt)),
-            //Add pinned announcent button
-            IconButton(
-                onPressed: () async {
-                  addAnnouncment(context).then((value) {
-                    if (value.announcement.isNotEmpty) {
-                      if (value.isPinned) {
-                        currentPinnedAnnouncemnt = value.announcement;
-                      } else {
-                        currentAnnouncement = value.announcement;
-                      }
-                      setState(() {});
-                    }
-                  });
-                },
-                icon: const Icon(Icons.add)),
-          ],
+          actions: currentIndex == 0
+              ? [
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          activeAnouncement = !activeAnouncement;
+                        });
+                      },
+                      icon: const Icon(Icons.restart_alt)),
+                  //Add pinned announcent button
+                  IconButton(
+                      onPressed: () async {
+                        addAnnouncment(context).then((value) {
+                          if (value.announcement.isNotEmpty) {
+                            if (value.isPinned) {
+                              currentPinnedAnnouncemnt = value.announcement;
+                            } else {
+                              currentAnnouncement = value.announcement;
+                            }
+                            setState(() {});
+                          }
+                        });
+                      },
+                      icon: const Icon(Icons.add)),
+                ]
+              : [],
         ),
         drawer: Drawer(
           child: ListView(
