@@ -37,13 +37,6 @@ class AiChatPageState extends State<AiChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (scrollController.positions.isNotEmpty) {
-    //   scrollController.animateTo(
-    //     scrollController.position.maxScrollExtent + 1000,
-    //     duration: const Duration(milliseconds: 200),
-    //     curve: Curves.easeOut,
-    //   );
-    // }
     isKeyboardVisible ? focusNode.requestFocus() : focusNode.unfocus();
     return Stack(
       children: [
