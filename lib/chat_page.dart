@@ -37,13 +37,13 @@ class AiChatPageState extends State<AiChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (scrollController.positions.isNotEmpty) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent + 1000,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-      );
-    }
+    // if (scrollController.positions.isNotEmpty) {
+    //   scrollController.animateTo(
+    //     scrollController.position.maxScrollExtent + 1000,
+    //     duration: const Duration(milliseconds: 200),
+    //     curve: Curves.easeOut,
+    //   );
+    // }
     isKeyboardVisible ? focusNode.requestFocus() : focusNode.unfocus();
     return Stack(
       children: [
@@ -108,41 +108,46 @@ class AiChatPageState extends State<AiChatPage> {
             ),
           ),
         ]),
-        Column(
-          children: [
-            isWaiting
-                ? const Center(
-                    child: LinearProgressIndicator(
-                      color: Colors.blue,
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          child: IgnorePointer(
+            child: Column(
+              children: [
+                isWaiting
+                    ? const Center(
+                        child: LinearProgressIndicator(
+                          color: Colors.blue,
+                        ),
+                      )
+                    : const SizedBox(),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0, 0.5, 1],
+                      colors: [
+                        Colors.white.withOpacity(1),
+                        Colors.white.withOpacity(.5),
+                        Colors.white.withOpacity(0)
+                      ],
                     ),
-                  )
-                : const SizedBox(),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [0, 0.5, 1],
-                  colors: [
-                    Colors.white.withOpacity(1),
-                    Colors.white.withOpacity(.5),
-                    Colors.white.withOpacity(0)
-                  ],
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+                      child: Text("AI Chat",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 28,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold))),
                 ),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-                  child: Text("AI Chat",
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontSize: 28,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold))),
+              ],
             ),
-          ],
+          ),
         ),
 
         //Text field
