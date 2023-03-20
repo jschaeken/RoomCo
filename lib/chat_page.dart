@@ -107,7 +107,7 @@ class AiChatPageState extends State<AiChatPage> {
                         ],
                       ),
                     const SizedBox(
-                      height: 50,
+                      height: 100,
                     )
                   ],
                 ),
