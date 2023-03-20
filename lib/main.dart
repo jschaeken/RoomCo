@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: const ColorScheme.light().copyWith(primary: Colors.black),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'RoomCo', roomNumber: '504'),
+      home: const MyHomePage(title: 'GPT 3.5 TURBO', roomNumber: '504'),
     );
   }
 }
@@ -149,6 +149,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
+            // selectedLabelStyle: const TextStyle(color: Colors.white),
+            // unselectedLabelStyle: const TextStyle(color: Colors.white),
+            selectedIconTheme: const IconThemeData(color: Colors.white),
+            unselectedItemColor: Colors.grey,
+            backgroundColor: Colors.black,
             onTap: (int index) {
               setState(() {
                 currentIndex = index;
@@ -157,179 +162,180 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: Icon(
+                  Icons.home,
+                ),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.chat),
+                icon: Icon(
+                  Icons.chat,
+                ),
                 label: 'AI Chat',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.person),
+                icon: Icon(
+                  Icons.person,
+                ),
                 label: 'Profile',
               ),
             ],
             currentIndex: currentIndex,
-            selectedItemColor: Colors.black),
-        body: SizedBox(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height - 100,
-          child: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: pageController,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                      width: double.infinity,
-                    ),
-                    Container(
-                      alignment: Alignment.topCenter,
-                      // height: 78,
-                      width: MediaQuery.of(context).size.width * .85,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.black, width: 4)),
-                      child: Column(
-                        children: [
-                          Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(5),
-                              child: ListTile(
-                                  onTap: () => {},
-                                  //pinned icon
-                                  leading: const Icon(Icons.push_pin,
-                                      color: Colors.black, size: 30),
-                                  title: Text(currentPinnedAnnouncemnt,
-                                      style: const TextStyle(fontSize: 25)),
-                                  subtitle: const Text('From Jacques'),
-                                  trailing: const CircleAvatar(
-                                    backgroundColor: Colors.amber,
-                                  )),
-                            ),
+            selectedItemColor: Colors.white),
+        body: PageView(
+            physics: const NeverScrollableScrollPhysics(),
+            controller: pageController,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                  ),
+                  Container(
+                    alignment: Alignment.topCenter,
+                    // height: 78,
+                    width: MediaQuery.of(context).size.width * .85,
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.black, width: 4)),
+                    child: Column(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
                           ),
-                        ],
-                      ),
+                          child: Material(
+                            borderRadius: BorderRadius.circular(5),
+                            child: ListTile(
+                                onTap: () => {},
+                                //pinned icon
+                                leading: const Icon(Icons.push_pin,
+                                    color: Colors.black, size: 30),
+                                title: Text(currentPinnedAnnouncemnt,
+                                    style: const TextStyle(fontSize: 25)),
+                                subtitle: const Text('From Jacques'),
+                                trailing: const CircleAvatar(
+                                  backgroundColor: Colors.amber,
+                                )),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      height: 20,
-                      width: double.infinity,
-                    ),
-                    //A box for announcements
-                    activeAnouncement
-                        ? Container(
-                            alignment: Alignment.topCenter,
-                            height: 130,
-                            width: MediaQuery.of(context).size.width * .85,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(5),
-                                border:
-                                    Border.all(color: Colors.black, width: 4)),
-                            child: Column(
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Text(currentAnnouncement,
-                                      style: const TextStyle(
-                                          fontSize: 25, color: Colors.black)),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                    width: double.infinity,
+                  ),
+                  //A box for announcements
+                  activeAnouncement
+                      ? Container(
+                          alignment: Alignment.topCenter,
+                          height: 130,
+                          width: MediaQuery.of(context).size.width * .85,
+                          decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(5),
+                              border:
+                                  Border.all(color: Colors.black, width: 4)),
+                          child: Column(
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                                const Spacer(),
-                                Padding(
+                                child: Text(currentAnnouncement,
+                                    style: const TextStyle(
+                                        fontSize: 25, color: Colors.black)),
+                              ),
+                              const Spacer(),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Row(
+                                  children: [
+                                    const Text("From Jacques",
+                                        style: TextStyle(
+                                            fontSize: 20, color: Colors.white)),
+                                    //Icons for history and notifications
+                                    const Spacer(),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.history,
+                                          color: Colors.white),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.notifications,
+                                          color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                            ],
+                          ),
+                        )
+                      : Container(
+                          alignment: Alignment.topCenter,
+                          height: 130,
+                          width: 400,
+                          decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(5),
+                              border:
+                                  Border.all(color: Colors.black, width: 4)),
+                          child: Column(
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: const Text("No Recent Announcements",
+                                    style: TextStyle(
+                                        fontSize: 25, color: Colors.grey)),
+                              ),
+                              const Spacer(),
+                              Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: Row(
-                                    children: [
-                                      const Text("From Jacques",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white)),
-                                      //Icons for history and notifications
-                                      const Spacer(),
-                                      IconButton(
+                                  child: Row(children: [
+                                    //Icons for history and notifications
+                                    const Spacer(),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.history,
+                                          color: Colors.white),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.notifications,
+                                          color: Colors.white),
+                                    ),
+                                    //add announcement button
+                                    IconButton(
                                         onPressed: () {},
-                                        icon: const Icon(Icons.history,
-                                            color: Colors.white),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.notifications,
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                              ],
-                            ),
-                          )
-                        : Container(
-                            alignment: Alignment.topCenter,
-                            height: 130,
-                            width: 400,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(5),
-                                border:
-                                    Border.all(color: Colors.black, width: 4)),
-                            child: Column(
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: const Text("No Recent Announcements",
-                                      style: TextStyle(
-                                          fontSize: 25, color: Colors.grey)),
-                                ),
-                                const Spacer(),
-                                Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Row(children: [
-                                      //Icons for history and notifications
-                                      const Spacer(),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.history,
-                                            color: Colors.white),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.notifications,
-                                            color: Colors.white),
-                                      ),
-                                      //add announcement button
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.add_circle),
-                                          color: Colors.white,
-                                          iconSize: 30),
-                                    ])),
-                              ],
-                            ),
+                                        icon: const Icon(Icons.add_circle),
+                                        color: Colors.white,
+                                        iconSize: 30),
+                                  ])),
+                            ],
                           ),
-                    const SizedBox(height: 5),
-                  ],
-                ),
-                const AiChatPage(),
-                const Center(child: Text('Profile Page')),
-              ]),
-        ));
+                        ),
+                  const SizedBox(height: 5),
+                ],
+              ),
+              const AiChatPage(),
+              const Center(child: Text('Profile Page')),
+            ]));
   }
 }
 

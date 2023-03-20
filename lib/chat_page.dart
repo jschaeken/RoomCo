@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:roomco/text_provider.dart';
 
@@ -14,7 +15,11 @@ class AiChatPage extends StatefulWidget {
   State<AiChatPage> createState() => AiChatPageState();
 }
 
-class AiChatPageState extends State<AiChatPage> {
+class AiChatPageState extends State<AiChatPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   String apiKey = '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';
   List<Chat> currentChatHisory = [];
   TextEditingController textEditingController = TextEditingController();
@@ -45,14 +50,17 @@ class AiChatPageState extends State<AiChatPage> {
     return Stack(
       children: [
         Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height - 130,
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                controller: scrollController,
+          Flexible(
+            flex: 1,
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              controller: scrollController,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 8.0,
+                  right: 8.0,
+                  top: 8.0,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -61,55 +69,37 @@ class AiChatPageState extends State<AiChatPage> {
                     for (var index = 0;
                         index < currentChatHisory.length;
                         index++)
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment:
-                            currentChatHisory[index].role == 'user'
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                        children: [
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * .6,
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: currentChatHisory[index].role == 'user'
-                                    ? Colors.blue
-                                    : Colors.grey,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Consumer<TextProvider>(
-                                      builder: (_, provider, child) => Text(
-                                            currentChatHisory[index].role ==
-                                                    'user'
-                                                ? currentChatHisory[index]
-                                                    .content
-                                                : index ==
-                                                        currentChatHisory
-                                                                .length -
-                                                            1
-                                                    ? provider.text
-                                                    : currentChatHisory[index]
-                                                        .content,
-                                            textAlign: TextAlign.start,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.white),
-                                          ))),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        ],
-                      ),
-                    const SizedBox(
-                      height: 100,
-                    )
+                      ChatBubble(
+                          currentChatHisory: currentChatHisory, index: index),
                   ],
+                ),
+              ),
+            ),
+          ),
+          //Text field
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 8.0, right: 8.0, bottom: 8.0, top: 6.0),
+              child: TextField(
+                onTapOutside: (event) => {
+                  isKeyboardVisible = false,
+                  focusNode.unfocus(),
+                  setState(() {})
+                },
+                controller: textEditingController,
+                focusNode: focusNode,
+                onSubmitted: (value) async {
+                  await handleSubmitted(value);
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Message',
+                  focusColor: Colors.white,
+                  fillColor: Colors.white,
                 ),
               ),
             ),
@@ -158,36 +148,6 @@ class AiChatPageState extends State<AiChatPage> {
             ),
           ),
         ),
-
-        //Text field
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: TextField(
-                  onTapOutside: (event) => {
-                        isKeyboardVisible = false,
-                        focusNode.unfocus(),
-                        setState(() {})
-                      },
-                  controller: textEditingController,
-                  focusNode: focusNode,
-                  onSubmitted: (value) async {
-                    await handleSubmitted(value);
-                  },
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Message',
-                      focusColor: Colors.white,
-                      fillColor: Colors.white)),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -210,9 +170,12 @@ class AiChatPageState extends State<AiChatPage> {
         setState(() {});
       }
       context.read<TextProvider>().addChunk(text);
-      if (scrollController.offset < scrollController.position.maxScrollExtent) {
-        scrollController.jumpTo(
+      if (scrollController.offset + 20 <
+          scrollController.position.maxScrollExtent) {
+        scrollController.animateTo(
           scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.fastLinearToSlowEaseIn,
         );
       }
     },
@@ -222,6 +185,74 @@ class AiChatPageState extends State<AiChatPage> {
       log('set last content to ${context.read<TextProvider>().text}');
       setState(() {});
     });
+  }
+}
+
+class ChatBubble extends StatelessWidget {
+  const ChatBubble({
+    super.key,
+    required this.currentChatHisory,
+    required this.index,
+  });
+
+  final List<Chat> currentChatHisory;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: currentChatHisory[index].role == 'user'
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * .6,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: currentChatHisory[index].role == 'user'
+                  ? Colors.black
+                  : Colors.blue,
+              borderRadius: currentChatHisory[index].role == 'user'
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    )
+                  : const BorderRadius.only(
+                      topRight: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+            ),
+            child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Consumer<TextProvider>(
+                    builder: (_, provider, child) => Text(
+                          currentChatHisory[index].role == 'user'
+                              ? currentChatHisory[index].content
+                              : index == currentChatHisory.length - 1
+                                  ? provider.text
+                                  : currentChatHisory[index].content,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              fontSize: 18, color: Colors.white),
+                        ))),
+          ),
+        ).animate().slide(
+              begin: currentChatHisory[index].role == 'user'
+                  ? const Offset(1, 0)
+                  : const Offset(-1, 0),
+              end: const Offset(0, 0),
+              delay: 200.milliseconds,
+            ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    );
   }
 }
 
