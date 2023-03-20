@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
+import 'package:roomco/text_provider.dart';
 
 class AiChatPage extends StatefulWidget {
   const AiChatPage({super.key});
@@ -13,13 +15,15 @@ class AiChatPage extends StatefulWidget {
 }
 
 class AiChatPageState extends State<AiChatPage> {
-  String apiKey = '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';
+  String apiKey = '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';
   List<Chat> currentChatHisory = [];
   TextEditingController textEditingController = TextEditingController();
   bool isWaiting = false;
   ScrollController scrollController = ScrollController();
   FocusNode focusNode = FocusNode();
   bool isKeyboardVisible = true;
+  String newRequestText = 'count to 10 1 by 1';
+  String streamResponse = '';
 
   @override
   void initState() {
@@ -76,15 +80,25 @@ class AiChatPageState extends State<AiChatPage> {
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(currentChatHisory[index].content,
-                                    textAlign:
-                                        currentChatHisory[index].role == 'user'
-                                            ? TextAlign.end
-                                            : TextAlign.start,
-                                    style: const TextStyle(
-                                        fontSize: 18, color: Colors.white)),
-                              ),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Consumer<TextProvider>(
+                                      builder: (_, provider, child) => Text(
+                                            currentChatHisory[index].role ==
+                                                    'user'
+                                                ? currentChatHisory[index]
+                                                    .content
+                                                : index ==
+                                                        currentChatHisory
+                                                                .length -
+                                                            1
+                                                    ? provider.text
+                                                    : currentChatHisory[index]
+                                                        .content,
+                                            textAlign: TextAlign.start,
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white),
+                                          ))),
                             ),
                           ),
                           const SizedBox(
@@ -106,13 +120,15 @@ class AiChatPageState extends State<AiChatPage> {
           child: IgnorePointer(
             child: Column(
               children: [
-                isWaiting
-                    ? const Center(
-                        child: LinearProgressIndicator(
-                          color: Colors.blue,
-                        ),
-                      )
-                    : const SizedBox(),
+                Consumer<TextProvider>(
+                  builder: (_, provider, child) => provider.isWaiting
+                      ? const Center(
+                          child: LinearProgressIndicator(
+                            color: Colors.blue,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
                 Container(
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
@@ -154,22 +170,15 @@ class AiChatPageState extends State<AiChatPage> {
             child: Padding(
               padding: const EdgeInsets.all(6.0),
               child: TextField(
+                  onTapOutside: (event) => {
+                        isKeyboardVisible = false,
+                        focusNode.unfocus(),
+                        setState(() {})
+                      },
                   controller: textEditingController,
                   focusNode: focusNode,
                   onSubmitted: (value) async {
-                    currentChatHisory.add(Chat(role: 'user', content: value));
-                    textEditingController.clear();
-                    isKeyboardVisible = false;
-                    //send message to ai
-                    isWaiting = true;
-                    setState(() {});
-
-                    currentChatHisory =
-                        await aiRequest(currentChatHisory, value, apiKey);
-
-                    setState(() {
-                      isWaiting = false;
-                    });
+                    await handleSubmitted(value);
                   },
                   decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -182,19 +191,57 @@ class AiChatPageState extends State<AiChatPage> {
       ],
     );
   }
+
+  handleSubmitted(String text) async {
+    currentChatHisory.add(Chat(role: 'user', content: text));
+
+    context.read<TextProvider>().isWaiting = true;
+    setState(() {});
+
+    textEditingController.clear();
+    isKeyboardVisible = false;
+    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+
+    aiRequest(currentChatHisory, newRequestText, apiKey, true, (text) {
+      if (currentChatHisory.last.role != 'assistant') {
+        context.read<TextProvider>().setText('');
+        currentChatHisory.add(createNewChat('assistant', text));
+        context.read<TextProvider>().isWaiting = false;
+        setState(() {});
+      }
+      context.read<TextProvider>().addChunk(text);
+      if (scrollController.offset < scrollController.position.maxScrollExtent) {
+        scrollController.jumpTo(
+          scrollController.position.maxScrollExtent,
+        );
+      }
+    },
+        //on finish
+        () {
+      currentChatHisory.last.content = context.read<TextProvider>().text;
+      log('set last content to ${context.read<TextProvider>().text}');
+      setState(() {});
+    });
+  }
 }
 
-Future<List<Chat>> aiRequest(
+Chat createNewChat(String role, String initialText) {
+  return Chat(role: role, content: initialText);
+}
+
+void aiRequest(
   List<Chat> chatHistory,
   String text,
   String apiKey,
+  bool isStream,
+  Function(String text) callbackNewChunk,
+  VoidCallback callbackStreamEnd,
 ) async {
   String endpoint = 'https://api.openai.com/v1/chat/completions';
   HttpClient httpClient = HttpClient();
   HttpClientRequest request = await httpClient.postUrl(Uri.parse(endpoint));
   request.headers.set('Content-Type', 'application/json');
   request.headers.set('Authorization', 'Bearer $apiKey');
-
   String payload = jsonEncode({
     // 'prompt': text,
     'model': 'gpt-3.5-turbo',
@@ -203,33 +250,31 @@ Future<List<Chat>> aiRequest(
             "role": e.role,
             "content": e.content,
           })
-    ]
+    ],
+    'stream': true
   });
   request.add(utf8.encode(payload));
-
-  //Send the request
   HttpClientResponse response = await request.close();
-  httpClient.close();
-  String responseBody = await response.transform(utf8.decoder).join();
 
-  final decoded = jsonDecode(responseBody);
-  log(decoded.toString());
-  if (decoded['choices'][0]['message']['content'] == null) {
-    // return 'An error has occured while processing your request. Try checking your API key to see if it is correct.';
-    chatHistory.add(Chat(
-        role: 'assistant',
-        content:
-            'An error has occured while processing your request. Try checking your API key to see if it is correct.'));
-  } else {
-    chatHistory.add(Chat(
-        role: 'assistant',
-        content:
-            decoded['choices'][0]['message']['content'].toString().trim()));
-  }
-  for (var i = 0; i < chatHistory.length; i++) {
-    print('${chatHistory[i].role}: ${chatHistory[i].content}');
-  }
-  return chatHistory;
+  //ATTMPET TO USE STREAM
+  response.listen((event) {
+    //parse response from list<int> to string
+    String responseBody = utf8.decode(event).substring(6);
+    log(responseBody);
+    if (responseBody.contains('[DONE]')) {
+      callbackStreamEnd();
+    } else {
+      var decoded = jsonDecode(responseBody);
+      String? newChunk = decoded['choices'][0]['delta']['content'];
+
+      if (newChunk != null) {
+        log(newChunk);
+        callbackNewChunk(newChunk);
+      }
+    }
+  });
+
+  httpClient.close();
 }
 
 class Chat {

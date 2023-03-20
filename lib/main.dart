@@ -4,12 +4,15 @@ import 'dart:io';
 // import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import 'package:roomco/chat_page.dart';
 import 'package:roomco/login_page.dart';
+import 'package:roomco/text_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => TextProvider()),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -149,8 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: (int index) {
               setState(() {
                 currentIndex = index;
-                pageController.animateToPage(index,
-                    duration: 300.ms, curve: Curves.easeInOut);
+                pageController.jumpToPage(index);
               });
             },
             items: const <BottomNavigationBarItem>[
