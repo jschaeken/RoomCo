@@ -48,12 +48,25 @@ class _MyHomePageState extends State<MyHomePage> {
   String currentPinnedAnnouncemnt = 'Do the dishes!';
   String currentAnnouncement = 'Latest Announcment';
   PageController pageController = PageController(initialPage: 0);
+  // gpt-4, gpt-4-0314, gpt-4-32k, gpt-4-32k-0314, gpt-3.5-turbo, gpt-3.5-turbo-0301
+
+  List<String> models = [
+    'gpt-4',
+    'gpt-4-0314',
+    'gpt-4-32k',
+    'gpt-4-32k-0314',
+    'gpt-3.5-turbo',
+    'gpt-3.5-turbo-0301'
+  ];
+  int modelIndex = 0;
+
+  bool clearConversation = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(models[modelIndex]),
           centerTitle: true,
           elevation: 0,
           actions: currentIndex == 0
@@ -81,7 +94,31 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                       icon: const Icon(Icons.add)),
                 ]
-              : [],
+              : currentIndex == 1
+                  ? [
+                      IconButton(
+                          onPressed: () {
+                            setState(() {
+                              modelIndex = (modelIndex + 1) % models.length;
+                            });
+                          },
+                          icon: const Icon(Icons.restart_alt)),
+                      GestureDetector(
+                        onTapDown: (TapDownDetails details) {
+                          setState(() {
+                            clearConversation = false;
+                          });
+                        },
+                        onTapUp: (TapUpDetails details) {
+                          setState(() {
+                            clearConversation = true;
+                          });
+                        },
+                        child: IconButton(
+                            onPressed: () {}, icon: const Icon(Icons.delete)),
+                      )
+                    ]
+                  : [],
         ),
         drawer: Drawer(
           child: ListView(
@@ -333,7 +370,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   const SizedBox(height: 5),
                 ],
               ),
-              const AiChatPage(),
+              AiChatPage(
+                selectedModel: models[modelIndex],
+                shouldKeepAlive: !clearConversation,
+              ),
               const Center(child: Text('Profile Page')),
             ]));
   }

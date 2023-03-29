@@ -9,7 +9,11 @@ import 'package:provider/provider.dart';
 import 'package:roomco/text_provider.dart';
 
 class AiChatPage extends StatefulWidget {
-  const AiChatPage({super.key});
+  const AiChatPage(
+      {super.key, required this.selectedModel, this.shouldKeepAlive = true});
+
+  final String selectedModel;
+  final bool shouldKeepAlive;
 
   @override
   State<AiChatPage> createState() => AiChatPageState();
@@ -18,7 +22,7 @@ class AiChatPage extends StatefulWidget {
 class AiChatPageState extends State<AiChatPage>
     with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => widget.shouldKeepAlive;
 
   String apiKey = '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';
   List<Chat> currentChatHisory = [];
@@ -29,11 +33,13 @@ class AiChatPageState extends State<AiChatPage>
   bool isKeyboardVisible = true;
   String newRequestText = 'count to 10 1 by 1';
   String streamResponse = '';
+  late String selectedModel;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    selectedModel = widget.selectedModel;
     scrollController.addListener(() {
       //on vertical drag start, hide keyboard
       if (scrollController.position.userScrollDirection ==
@@ -46,6 +52,14 @@ class AiChatPageState extends State<AiChatPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    if (!widget.shouldKeepAlive) {
+      setState(() {
+        currentChatHisory = [];
+        textEditingController = TextEditingController();
+        isWaiting = false;
+      });
+    }
     isKeyboardVisible ? focusNode.requestFocus() : focusNode.unfocus();
     return Stack(
       children: [
@@ -148,6 +162,25 @@ class AiChatPageState extends State<AiChatPage>
             ),
           ),
         ),
+        Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () {
+                setState(() {
+                  currentChatHisory = [];
+                });
+              },
+              child: const Text(
+                'Clear Chat',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -163,6 +196,7 @@ class AiChatPageState extends State<AiChatPage>
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
 
     aiRequest(currentChatHisory, newRequestText, apiKey, true, (text) {
+      log('model: $selectedModel');
       if (currentChatHisory.last.role != 'assistant') {
         context.read<TextProvider>().setText('');
         currentChatHisory.add(createNewChat('assistant', text));
@@ -184,7 +218,7 @@ class AiChatPageState extends State<AiChatPage>
       currentChatHisory.last.content = context.read<TextProvider>().text;
       log('set last content to ${context.read<TextProvider>().text}');
       setState(() {});
-    });
+    }, selectedModel);
   }
 }
 
@@ -267,6 +301,7 @@ void aiRequest(
   bool isStream,
   Function(String text) callbackNewChunk,
   VoidCallback callbackStreamEnd,
+  String model,
 ) async {
   String endpoint = 'https://api.openai.com/v1/chat/completions';
   HttpClient httpClient = HttpClient();
@@ -275,7 +310,7 @@ void aiRequest(
   request.headers.set('Authorization', 'Bearer $apiKey');
   String payload = jsonEncode({
     // 'prompt': text,
-    'model': 'gpt-3.5-turbo',
+    'model': model,
     'messages': [
       ...chatHistory.map((e) => {
             "role": e.role,
