@@ -333,195 +333,197 @@ class _QrDemoFomoState extends State<QrDemoFomo> {
     print('rebuilding');
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 32, 32, 32),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(
-              width: double.infinity,
-            ),
-            const Text(
-              'Fomo QR Code Demo',
-              style: TextStyle(
-                  color: Color.fromARGB(255, 216, 21, 99),
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 50,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Ticket Data:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        currentData,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Device ID:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        deviceID,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Salt:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        salt,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Flexible(
-                        child: Text(
-                          'Current Time:',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: double.infinity,
+              ),
+              const Text(
+                'Fomo QR Code Demo',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 216, 21, 99),
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Ticket Data:',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.w500),
                         ),
-                      ),
-                      Flexible(
-                        child: StatefulBuilder(builder: (context, refresh) {
-                          var localTimeString =
-                              '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}';
-                          //make this update every 10 milliseconds
-                          Timer.periodic(const Duration(milliseconds: 10),
-                              (timer) {
-                            refresh(() {
-                              localTimeString =
-                                  '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}:${DateTime.now().millisecond}';
+                        Text(
+                          currentData,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Device ID:',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          deviceID,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Salt:',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          salt,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Flexible(
+                          child: Text(
+                            'Current Time:',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Flexible(
+                          child: StatefulBuilder(builder: (context, refresh) {
+                            var localTimeString =
+                                '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}';
+                            //make this update every 10 milliseconds
+                            Timer.periodic(const Duration(milliseconds: 10),
+                                (timer) {
+                              refresh(() {
+                                localTimeString =
+                                    '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}:${DateTime.now().millisecond}';
+                              });
                             });
-                          });
-                          return Text(
-                            localTimeString,
+                            return Text(
+                              localTimeString,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                      color: Colors.white,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Flexible(
+                          child: Text(
+                            'Time Epoch Snapshot for Hash:',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            currentTimeString,
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500),
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                  const Divider(
-                    color: Colors.white,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Flexible(
-                        child: Text(
-                          'Time Epoch Snapshot for Hash:',
+                          ),
+                        ),
+                      ],
+                    ),
+                    //spacing
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Current Hash:',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.w500),
                         ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          currentTimeString,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: Text(
+                            currentHash,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  //spacing
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Current Hash:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Text(
-                          currentHash,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            AnimatedBorderContainer(
-              child: QrImage(
-                data: currentHash,
-                version: QrVersions.auto,
-                size: 240.0,
-                errorCorrectionLevel: QrErrorCorrectLevel.L,
-                dataModuleStyle: const QrDataModuleStyle(
-                  dataModuleShape: QrDataModuleShape.circle,
-                  color: Color.fromARGB(255, 216, 21, 99),
-                ),
-                eyeStyle: const QrEyeStyle(
-                  eyeShape: QrEyeShape.circle,
-                  color: Color.fromARGB(255, 216, 21, 99),
+                      ],
+                    )
+                  ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(
+                height: 20,
+              ),
+              AnimatedBorderContainer(
+                child: QrImage(
+                  data: currentHash,
+                  version: QrVersions.auto,
+                  size: 240.0,
+                  errorCorrectionLevel: QrErrorCorrectLevel.L,
+                  dataModuleStyle: const QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.circle,
+                    color: Color.fromARGB(255, 216, 21, 99),
+                  ),
+                  eyeStyle: const QrEyeStyle(
+                    eyeShape: QrEyeShape.circle,
+                    color: Color.fromARGB(255, 216, 21, 99),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
