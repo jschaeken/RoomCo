@@ -22,7 +22,7 @@ class AiChatPage extends StatefulWidget {
 class AiChatPageState extends State<AiChatPage>
     with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive => widget.shouldKeepAlive;
+  bool get wantKeepAlive => true;
 
   String apiKey = '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';
   List<Chat> currentChatHisory = [];
@@ -53,13 +53,9 @@ class AiChatPageState extends State<AiChatPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (!widget.shouldKeepAlive) {
-      setState(() {
-        currentChatHisory = [];
-        textEditingController = TextEditingController();
-        isWaiting = false;
-      });
-    }
+    // if (currentChatHisory.isEmpty) {
+    //   currentChatHisory.add(createNewChat('assistant', 'Hi, I am AI Chat'));
+    // }
     isKeyboardVisible ? focusNode.requestFocus() : focusNode.unfocus();
     return Stack(
       children: [

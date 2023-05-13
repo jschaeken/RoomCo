@@ -22,13 +22,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData().copyWith(
-        colorScheme: const ColorScheme.light().copyWith(primary: Colors.black),
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'GPT 3.5 TURBO', roomNumber: '504'),
-    );
+        title: 'Flutter Demo',
+        theme: ThemeData().copyWith(
+          colorScheme:
+              const ColorScheme.light().copyWith(primary: Colors.black),
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const QrDemoFomo());
   }
 }
 
