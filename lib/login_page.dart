@@ -302,10 +302,10 @@ class QrDemoFomo extends StatefulWidget {
 class _QrDemoFomoState extends State<QrDemoFomo> {
   //making the widget rebuild every 1 second
 
-  String currentData = "TICKET_COWBOYS_XYZ_123";
+  String currentData = "TICKET_COWBOYS_XYZ";
   String currentHash = "";
   String currentTimeString = "";
-  final String deviceID = "1234567890";
+  final String deviceID = "DeviceId_12345";
   final String salt = 'FOMO_SALT_PHRASE';
 
   String hashData(String data) {
@@ -341,6 +341,7 @@ class _QrDemoFomoState extends State<QrDemoFomo> {
             children: [
               const SizedBox(
                 width: double.infinity,
+                height: 30,
               ),
               const Text(
                 'Fomo QR Code Demo',
@@ -359,19 +360,24 @@ class _QrDemoFomoState extends State<QrDemoFomo> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Ticket Data:',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
+                        const Flexible(
+                          child: Text(
+                            'Ticket Data:',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
                         ),
-                        Text(
-                          currentData,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
+                        Flexible(
+                          flex: 2,
+                          child: Text(
+                            currentData,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
                         ),
                       ],
                     ),
