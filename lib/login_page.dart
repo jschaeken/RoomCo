@@ -332,6 +332,24 @@ class _QrDemoFomoState extends State<QrDemoFomo> {
     Animate.restartOnHotReload;
     print('rebuilding');
     return Scaffold(
+      drawer: Drawer(
+          child: Column(
+        children: [
+          SizedBox(
+            height: 600,
+            child: ListView.builder(
+              itemCount: 80,
+              itemBuilder: (context, i) => Card(
+                color: Colors.red[100 * ((i + 1) % 8)],
+                child: ListTile(
+                  title: Text('Item $i'),
+                ),
+              ),
+            ),
+          )
+        ],
+      )),
+      appBar: AppBar(),
       backgroundColor: const Color.fromARGB(255, 32, 32, 32),
       body: SafeArea(
         child: SingleChildScrollView(
